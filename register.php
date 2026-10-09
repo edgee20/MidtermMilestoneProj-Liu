@@ -12,7 +12,7 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
     if (lengthOf($name) < 2 || lengthOf($name) > 100) { $errors[] = 'Name must have 2-100 characters.'; }
     if (strlen($email) > 255 || !filter_var($email, FILTER_VALIDATE_EMAIL)) { $errors[] = 'Enter a valid email.'; }
     // PHP 8.0 PASSWORD_DEFAULT uses bcrypt, which only uses the first 72 bytes.
-    if (lengthOf($password) < 8 || strlen($password) > 72) { $errors[] = 'Password needs at least 8 characters and at most 72 bytes.'; }
+    if (lengthOf($password) < 8 || strlen($password) > 72 || strpos($password, chr(0)) !== false) { $errors[] = 'Password needs at least 8 characters, at most 72 bytes, and no null characters.'; }
     if ($password !== $confirm) { $errors[] = 'Passwords do not match.'; }
     if (!$errors) {
         try {
