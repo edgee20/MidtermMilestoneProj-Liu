@@ -8,7 +8,7 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
     requirePost();
     $email = textInput($_POST, 'email');
     $password = isset($_POST['password']) && is_string($_POST['password']) ? $_POST['password'] : '';
-    if (!filter_var($email, FILTER_VALIDATE_EMAIL) || $password === '' || strlen($password) > 72) {
+    if (strlen($email) > 255 || !filter_var($email, FILTER_VALIDATE_EMAIL) || $password === '' || strlen($password) > 72 || strpos($password, chr(0)) !== false) {
         $errors[] = 'Enter a valid email and password.';
     } else {
         $user = $users->authenticate($email, $password);
