@@ -1,0 +1,96 @@
+# Lutong Bahay
+
+A small, member-only Filipino recipe-sharing application for a midterm PHP milestone. Traditional PHP pages handle requests; six classes contain database operations. No framework, installation, external assets, uploads, or build tools.
+
+## Features
+
+- Register/login/logout with hashed passwords and native sessions.
+- Browse newest recipes; combine title/description search with category filtering.
+- Recipe CRUD with separate ordered ingredient rows and dynamic input fields.
+- Author-only comment CRUD and edited indicators.
+- Asynchronous save/unsave and personal favorites.
+- Unicode-aware reading time: 200 words/minute, rounded up, minimum one minute.
+- Server validation, prepared statements, escaping, CSRF, and ownership checks.
+- Simple responsive CSS.
+
+## Run with XAMPP
+
+1. Use XAMPP with PHP 8.0+, Apache, MySQL/MariaDB, phpMyAdmin, PDO MySQL, and mbstring.
+2. Start Apache and MySQL. This folder is C:\xampp\htdocs\MidtermMilestoneProj-Liu.
+3. **The database has already been imported in this environment.** On another machine, open http://localhost/phpmyadmin/ → **Import** → choose database.sql → **Go**. It creates lutong_bahay and eight categories. Import once into a new database; it does not delete/overwrite existing tables.
+4. Check config/database.php: localhost, database lutong_bahay, user root, empty password.
+5. Open **http://localhost/MidtermMilestoneProj-Liu/**. Register, log in, and share your first recipe. No demo accounts or recipes are bundled.
+
+If the folder is renamed to lutong-bahay, the URL is http://localhost/lutong-bahay/. Open through Apache, not Explorer. PHP and the database connection use Philippine time.
+
+Session cookies use HttpOnly and SameSite=Lax. Secure is enabled over HTTPS and disabled for local HTTP. Login regenerates session IDs; logout expires the cookie. For deployment use HTTPS, private credentials, and a restricted database user. PHP 8.0 uses bcrypt for PASSWORD_DEFAULT; passwords require at least eight characters and at most 72 bytes.
+
+## Structure
+
+~~~text
+index.php                  Feed and GET search/filter
+login.php, register.php    Public authentication forms
+logout.php                 POST logout
+recipe.php                 Detail and comments
+create-recipe.php          Create request and form
+edit-recipe.php            Author-only edit
+delete-recipe.php          POST delete
+comment-action.php         POST comment add/edit/delete
+favorites.php              Member's saved recipes
+config/                    App setup and database settings
+classes/                   Database, User, Recipe, Category, Comment, Favorite
+includes/                  Auth/helpers and shared header/footer/form/list
+api/toggle_favorite.php    Authenticated POST JSON endpoint
+assets/css/style.css       Responsive styles
+assets/js/script.js        Ingredient fields, Fetch favorites, confirmation
+tests/smoke.php            CLI-only real HTTP/database checks
+database.sql               Six-table schema and category seeds
+lutong_bahay_export.sql    Genuine phpMyAdmin Quick SQL export
+DEFENSE_GUIDE.md            Lesson mapping and oral practice
+VERIFICATION.md             Actual checks and remaining manual checks
+~~~
+
+## Relationships
+
+Exactly six tables: users, categories, recipes, ingredients, comments, favorites. Users have many recipes/comments; categories have many recipes; recipes have many ingredients/comments. Favorites represents many-to-many users/recipes with a composite primary key preventing duplicate saves. Ingredients are individual ordered rows. Email and category names are unique. Foreign keys preserve integrity. Recipe deletion cascades to ingredients, comments, and favorites. Referenced categories use ON DELETE RESTRICT.
+
+Recipe creation/editing uses transactions: all changes succeed or roll back together. Classes use PDO prepared statements with input bound separately from SQL. Pages validate request data before calling classes.
+
+## Test and rehearse
+
+Actual results are in VERIFICATION.md. With Apache/MySQL running:
+
+~~~powershell
+C:\xampp\php\php.exe tests\smoke.php
+~~~
+
+This creates two temporary accounts and content, then deletes only those accounts and associated records in a finally block. Use a local development database.
+
+Browser rehearsal:
+
+1. Register A and B; try duplicate emails, wrong passwords, and logout. Visit protected URLs as a guest.
+2. A creates a recipe; add/remove ingredients, search/filter, edit/reorder, and check Edited.
+3. Save/unsave from feed, detail, and Favorites. Inspect POST/JSON in Network tools; simulate network failure.
+4. Add/edit/delete comments. B can read A's content but cannot change it, including direct requests.
+5. Delete a recipe and inspect cascaded rows in phpMyAdmin.
+6. Check phone widths, keyboard navigation, confirmation dialogs, and dynamic fields.
+
+## Required genuine phpMyAdmin export
+
+database.sql is a setup script. **lutong_bahay_export.sql is included**, generated by submitting the running local phpMyAdmin 5.2.1 Quick SQL export form on October 9, 2026. It contains six tables, foreign keys, and only the category seed data. To regenerate after schema changes:
+
+1. Start Apache/MySQL; open http://localhost/phpmyadmin/.
+2. Select lutong_bahay. Use a clean submission database with categories and no private member data.
+3. Click **Export** → **Quick** → **SQL** → **Export**.
+4. Save as lutong_bahay_export.sql in the project root.
+5. Confirm all six tables/relationships and commit both SQL files.
+
+Do not rename the setup script to pretend it is an export. Back up data before cleaning a database.
+
+## Submission checklist
+
+- Rehearse two-account workflows and DEFENSE_GUIDE.md.
+- Include source, database.sql, README, and genuine lutong_bahay_export.sql.
+- Exclude private credentials, personal data, and temporary files.
+- Add screenshots only after taking actual screenshots.
+- Review changes, commit to your milestone repository, and push when ready. No automatic push is performed.
