@@ -1,5 +1,7 @@
 <?php
 declare(strict_types=1);
+
+// Its job is to prevent user-controlled text from being interpreted as HTML.
 function e(?string $value): string
 {
     return htmlspecialchars($value ?? "", ENT_QUOTES, "UTF-8");
@@ -91,6 +93,8 @@ function readMinutes(array $recipe, array $ingredients): int
         "/[\p{L}\p{N}]+(?:[\x{0027}\x{2019}-][\p{L}\p{N}]+)*/u",
         $text,
     );
+    // This regex is basically trying to identify words, including Unicode 
+    // letters/numbers and words containing apostrophes or hyphens.
     return max(1, (int) ceil(($words === false ? 0 : $words) / 200));
 }
 function recipeInput(array $source): array
@@ -114,6 +118,9 @@ function recipeErrors(array $data, Category $categories): array
             "title" => [3, 150],
             "description" => [10, 500],
             "instructions" => [10, 10000],
+            // title          → minimum 3,  maximum 150
+            // description    → minimum 10, maximum 500
+            // instructions   → minimum 10, maximum 10000
         ]
         as $field => $bounds
     ) {
@@ -153,3 +160,11 @@ function showErrors(array $errors): void
     }
     echo "</ul></div>";
 }
+
+// Output safety       → e()
+// Input handling      → textInput(), positiveId(), lengthOf()
+// Navigation/errors   → redirect(), fail()
+// Security            → csrfToken(), csrfField(), validCsrf(), requirePost()
+// UI/session helpers  → flash(), dateLabel(), showErrors()
+// Recipe processing   → recipeInput(), recipeErrors()
+// Extra feature       → readMinutes()

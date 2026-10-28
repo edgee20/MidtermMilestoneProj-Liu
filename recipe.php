@@ -160,5 +160,5 @@ require __DIR__ . "/includes/header.php";
 <?php require __DIR__ . "/includes/footer.php"; ?>
 
 <script>
-    console.log(<?= json_encode($recipeComments) ?>);
+    console.log(<?= json_encode($item) ?>);
 </script>
