@@ -21,7 +21,7 @@
 <fieldset><legend>Ingredients</legend><small>Include amounts, for example: 2 tablespoons soy sauce. Maximum 30 ingredients.</small>
 <div data-ingredients>
 <?php foreach (
-    array_slice($data["ingredients"] ?: [""], 0, 30)
+    array_slice($data["ingredients"] ?: [""], 0, 30) //limits the array to the first 30 ingredients.
     as $ingredient
 ): ?>
 <div class="ingredient-row"><label>Ingredient<input name="ingredients[]" maxlength="255" value="<?= e(
